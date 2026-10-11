@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="420" viewBox="0 0 1440 420" role="img" aria-labelledby="banner-title banner-description" font-family="Arial, Helvetica, sans-serif">
+  <title id="banner-title">Waste Triage — computer vision for waste recognition</title>
+  <desc id="banner-description">A dark navy research banner with an original waste container and camera lens emblem. A connected workflow detects, classifies, aggregates, and decides, producing material, condition, disposal route, and ordinal threat outputs.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10263b"/>
+      <stop offset="0.6" stop-color="#0b192b"/>
+      <stop offset="1" stop-color="#101f35"/>
+    </linearGradient>
+    <radialGradient id="emerald-glow" cx="0.14" cy="0.52" r="0.72">
+      <stop offset="0" stop-color="#13cba4" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#13cba4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blue-glow" cx="0.88" cy="0.38" r="0.5">
+      <stop offset="0" stop-color="#3a8bff" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#3a8bff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="brand" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#5de4e9"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="0.57" stop-color="#2dd4bf"/>
+      <stop offset="1" stop-color="#60a5fa"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#71a1bd" stroke-opacity="0.045"/>
+    </pattern>
+  </defs>
+
+  <rect width="1440" height="420" rx="24" fill="url(#background)"/>
+  <rect width="1440" height="420" rx="24" fill="url(#emerald-glow)"/>
+  <rect width="1440" height="420" rx="24" fill="url(#blue-glow)"/>
+  <rect x="1" y="1" width="1438" height="418" rx="23" fill="url(#grid)" stroke="#46647a" stroke-opacity="0.3"/>
+  <path d="M64 2H1376" stroke="url(#edge)" stroke-width="4"/>
+
+  <!-- Quiet circuit traces frame the content without competing with it. -->
+  <g fill="none" stroke="#7dc6df" stroke-width="1.3" stroke-opacity="0.13">
+    <path d="M0 76H66L92 50H214"/>
+    <path d="M0 349H66L92 375H212"/>
+    <path d="M1384 49H1402L1422 69H1440"/>
+    <path d="M1110 384H1360L1390 354H1440"/>
+  </g>
+  <g fill="#7dc6df" fill-opacity="0.3">
+    <circle cx="214" cy="50" r="3"/>
+    <circle cx="212" cy="375" r="3"/>
+    <circle cx="1110" cy="384" r="3"/>
+  </g>
+
+  <!-- Original emblem: a waste container, a lens, and three photographed views. -->
+  <g transform="translate(148 210)">
+    <circle r="94" fill="#113647" fill-opacity="0.45" stroke="#41cdb2" stroke-opacity="0.17"/>
+    <circle r="79" fill="none" stroke="#52d8ca" stroke-opacity="0.2" stroke-dasharray="3 11"/>
+    <g fill="none" stroke="url(#brand)" stroke-width="2" stroke-opacity="0.55">
+      <path d="M-55-57L-28-33"/>
+      <path d="M58-47L29-26"/>
+      <path d="M65 49L32 34"/>
+    </g>
+    <g fill="#102b3c" stroke="url(#brand)" stroke-width="2.5">
+      <rect x="-73" y="-76" width="31" height="29" rx="7"/>
+      <rect x="47" y="-65" width="31" height="29" rx="7"/>
+      <rect x="56" y="35" width="31" height="29" rx="7"/>
+    </g>
+    <g stroke="#94f3d9" stroke-width="1.8" fill="none" stroke-linecap="round">
+      <path d="M-66-55L-59-62L-50-54M-59-68H-55"/>
+      <path d="M55-43L61-50L70-42M64-57H68"/>
+      <path d="M63 56L69 49L79 57M72 42H76"/>
+    </g>
+    <path d="M-20-44V-54H20V-44" fill="none" stroke="url(#brand)" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M-46-40H46" fill="none" stroke="url(#brand)" stroke-width="6" stroke-linecap="round"/>
+    <path d="M-38-28L-30 49Q-29 57-20 57H20Q29 57 30 49L38-28Z" fill="#123d47" stroke="url(#brand)" stroke-width="4.5" stroke-linejoin="round"/>
+    <circle cy="12" r="27" fill="#0b2534" stroke="#4de1bb" stroke-width="3"/>
+    <circle cy="12" r="18" fill="#173c4e" stroke="#70e9e9" stroke-width="2"/>
+    <circle cy="12" r="8" fill="#75efcc"/>
+    <path d="M-4 6L5 3" fill="none" stroke="#c7fff0" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="-57" cy="49" r="5" fill="#f4bf65"/>
+  </g>
+
+  <circle cx="278" cy="109" r="4" fill="#37d5a1"/>
+  <text x="294" y="115" fill="#88dacb" font-size="18" font-weight="700" letter-spacing="2.2">COMPUTER VISION / WASTE RECOGNITION</text>
+  <text x="270" y="193" fill="#f3f9ff" font-size="74" font-weight="700" letter-spacing="-2.5">Waste <tspan fill="url(#brand)">Triage</tspan></text>
+  <text x="274" y="236" fill="#bdd0df" font-size="25">Multi-view waste recognition and disposal guidance</text>
+
+  <text x="274" y="283" fill="#7d9caf" font-size="16" font-weight="700" letter-spacing="1.6">FOUR PREDICTION HEADS</text>
+  <g font-size="21" font-weight="600">
+    <rect x="270" y="301" width="140" height="46" rx="12" fill="#123a39" stroke="#32d39c" stroke-opacity="0.35"/>
+    <circle cx="290" cy="324" r="3.5" fill="#4bdda9"/>
+    <text x="302" y="331" fill="#bcf9dd">Material</text>
+    <rect x="422" y="301" width="153" height="46" rx="12" fill="#113641" stroke="#2dd4bf" stroke-opacity="0.35"/>
+    <circle cx="442" cy="324" r="3.5" fill="#5eead4"/>
+    <text x="454" y="331" fill="#b7f6ed">Condition</text>
+    <rect x="587" y="301" width="185" height="46" rx="12" fill="#172e4b" stroke="#60a5fa" stroke-opacity="0.35"/>
+    <circle cx="607" cy="324" r="3.5" fill="#7bb6ff"/>
+    <text x="619" y="331" fill="#c3ddff">Disposal route</text>
+    <rect x="784" y="301" width="184" height="46" rx="12" fill="#37312c" stroke="#f4bf65" stroke-opacity="0.35"/>
+    <circle cx="804" cy="324" r="3.5" fill="#f4bf65"/>
+    <text x="816" y="331" fill="#f5d7a0">Ordinal threat</text>
+  </g>
+
+  <!-- Four stages follow a continuous, directional path. -->
+  <text x="1193" y="66" text-anchor="middle" fill="#7d9caf" font-size="16" font-weight="700" letter-spacing="1.2">ONE ITEM / MULTIPLE VIEWS</text>
+  <g fill="none" stroke="#4f8ba8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1170 135H1215M1207 130L1215 135L1207 140"/>
+    <path d="M1295 174V210H1095V239M1090 231L1095 239L1100 231"/>
+    <path d="M1170 280H1215M1207 275L1215 280L1207 285"/>
+  </g>
+  <g stroke-width="1.2">
+    <rect x="1020" y="96" width="150" height="78" rx="15" fill="#123b3c" stroke="#3ad0ad" stroke-opacity="0.4"/>
+    <rect x="1220" y="96" width="150" height="78" rx="15" fill="#143347" stroke="#4dcee2" stroke-opacity="0.4"/>
+    <rect x="1020" y="242" width="150" height="78" rx="15" fill="#172f4b" stroke="#70adf6" stroke-opacity="0.4"/>
+    <rect x="1220" y="242" width="150" height="78" rx="15" fill="#30312e" stroke="#f4bf65" stroke-opacity="0.4"/>
+  </g>
+  <g fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1083 126V118H1091M1099 118H1107V126M1107 130V138H1099M1091 138H1083V130" stroke="#69e4c1"/>
+    <rect x="1090" y="124" width="10" height="8" rx="2" stroke="#69e4c1"/>
+    <path d="M1284 120H1306M1284 128H1306M1284 136H1306" stroke="#70dbed"/>
+    <circle cx="1289" cy="120" r="2.5" fill="#143347" stroke="#70dbed"/>
+    <circle cx="1300" cy="128" r="2.5" fill="#143347" stroke="#70dbed"/>
+    <circle cx="1293" cy="136" r="2.5" fill="#143347" stroke="#70dbed"/>
+    <path d="M1086 266L1095 277L1104 266M1095 277V283" stroke="#91bbff"/>
+    <circle cx="1085" cy="264" r="3" fill="#172f4b" stroke="#91bbff"/>
+    <circle cx="1105" cy="264" r="3" fill="#172f4b" stroke="#91bbff"/>
+    <circle cx="1095" cy="284" r="3" fill="#172f4b" stroke="#91bbff"/>
+    <path d="M1285 274L1292 281L1306 266" stroke="#f4cc85" stroke-width="3"/>
+  </g>
+  <g text-anchor="middle" font-size="18" font-weight="700" letter-spacing="1">
+    <text x="1095" y="157" fill="#adf5dc">DETECT</text>
+    <text x="1295" y="157" fill="#b6eff6">CLASSIFY</text>
+    <text x="1095" y="304" fill="#c4daff">AGGREGATE</text>
+    <text x="1295" y="304" fill="#f5d7a0">DECIDE</text>
+  </g>
+
+  <path d="M270 371H968" stroke="#82acbd" stroke-opacity="0.14"/>
+  <text x="274" y="393" fill="#7894a9" font-size="16" letter-spacing="0.7">RESEARCH NOTEBOOKS</text>
+  <circle cx="480" cy="388" r="2" fill="#2dd4bf"/>
+  <text x="496" y="393" fill="#7894a9" font-size="16" letter-spacing="0.7">EXPERIMENT RESULTS</text>
+  <circle cx="692" cy="388" r="2" fill="#2dd4bf"/>
+  <text x="708" y="393" fill="#7894a9" font-size="16" letter-spacing="0.7">THESIS REPORT</text>
+</svg>

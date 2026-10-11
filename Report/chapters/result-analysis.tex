@@ -1,0 +1,365 @@
+\section{Introduction}
+This chapter evaluates the proposed system. It first defines the performance metrics used for the four heads, the detector, and the decision layer, then presents the classification backbone benchmark, the headline results with confidence intervals, calibration, the detector benchmark, detection and end-to-end performance, external validation, an interpretability and qualitative walkthrough, and an analysis of the hardest rare classes. Two complementary evaluations are used throughout. The deployed model, trained on the training split, is measured on the held-out 50-item test split. In addition, pooled out-of-fold predictions over an earlier 457-item dataset provide a robustness estimate with bootstrap confidence intervals.
+
+\section{Performance Evaluation Metrics}
+\subsection{Precision, Recall, and F1-Score}
+Precision is the fraction of predicted positives that are correct, recall the fraction of true positives that are retrieved, and F1 their harmonic mean:
+\begin{equation}
+\text{Precision} = \frac{TP}{TP+FP}, \qquad \text{Recall} = \frac{TP}{TP+FN},
+\end{equation}
+\begin{equation}
+\text{F1} = 2\cdot\frac{\text{Precision}\cdot\text{Recall}}{\text{Precision}+\text{Recall}}.
+\end{equation}
+For multi-class heads we report macro-F1 (the unweighted mean of per-class F1), which counts rare classes equally and is therefore the fair metric under imbalance.
+
+\subsection{mAP@50 and mAP@50-95 (detection)}
+Detection quality is measured by mean Average Precision (mAP). The Intersection over Union (IoU) between a predicted box and the ground truth is
+\begin{equation}
+\text{IoU} = \frac{\text{area of overlap}}{\text{area of union}}.
+\end{equation}
+mAP@50 is the mean Average Precision at an IoU threshold of 0.50, and mAP@50-95 averages mAP over IoU thresholds from 0.50 to 0.95 in steps of 0.05.
+
+\subsection{Quadratic Weighted Kappa (threat)}
+Because threat is ordinal, it is evaluated with the Quadratic Weighted Kappa (QWK), which rewards predictions that are close on the 0-3 scale and penalizes large rank errors quadratically. A QWK of 1 is perfect agreement and 0 is chance-level.
+
+\subsection{AUROC, ECE, and Hazard Recall}
+The binary condition head is evaluated with the threshold-free AUROC. Calibration is measured with the Expected Calibration Error (ECE), the average gap between confidence and accuracy across 15 confidence bins. The decision layer is judged primarily by hazard recall: the fraction of truly hazardous (Special-route) items routed to Special or referred for human review. Strict Special-routing recall counts only automatic Special decisions, and coverage measures the fraction of all items receiving an automatic decision. Reporting these together distinguishes safe referral from successful automatic routing.
+
+\section{Classification Backbone Benchmark}
+Ten classifiers spanning three architectural families were evaluated on the same held-out split at the item level: five CNNs, four self-supervised or vision-language vision transformers (DINOv2 ViT-S, DINOv2 ViT-B, DINOv2 ViT-S with register tokens, and SigLIP ViT-B), and a four-backbone feature-fusion ensemble. The candidates share the task definitions and data split, with transformer-specific fine-tuning as described in the methodology chapter. Table~\ref{tab:backbones} and Figure~\ref{fig:backbones} summarize their performance. ConvNeXt-S (ImageNet-22k) is the strongest single backbone on the primary material task and is used in the deployed pipeline. The final row of Table~\ref{tab:backbones} is a best-per-head \emph{oracle}: it combines the best value in each column, with material accuracy and macro-F1 from ConvNeXt-S or fusion, route from ResNet50, threat QWK and material ECE from fusion, and condition AUROC from DINOv2 ViT-S. This row indicates the performance available across several models rather than the outcome of one shared-backbone network.
+
+\begin{table}[!h]
+\centering
+\caption{Per-backbone results on the held-out split (item-level); best per column in bold.}
+\label{tab:backbones}
+\footnotesize\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{llcccccc}
+\toprule
+ & & \multicolumn{2}{c}{\textbf{Material}} & \textbf{Route} & \textbf{Threat} & \textbf{Cond.} & \textbf{Mat.} \\
+\cmidrule(lr){3-4}
+\textbf{Backbone} & \textbf{Family} & \textbf{acc} & \textbf{F1} & \textbf{F1} & \textbf{QWK} & \textbf{AUROC} & \textbf{ECE} \\
+\midrule
+\textbf{ConvNeXt-S (IN-22k)} & CNN & \textbf{0.840} & \textbf{0.840} & 0.740 & 0.826 & 0.865 & 0.110 \\
+Fusion (4-bb) & Ensemble & \textbf{0.840} & \textbf{0.840} & 0.740 & \textbf{0.857} & 0.874 & \textbf{0.058} \\
+ConvNeXt-T & CNN & 0.820 & 0.823 & 0.750 & 0.840 & 0.794 & 0.116 \\
+DINOv2 ViT-B & Transformer & 0.820 & 0.818 & 0.817 & 0.839 & 0.890 & 0.071 \\
+SigLIP ViT-B & Transformer & 0.820 & 0.814 & 0.768 & 0.775 & 0.833 & 0.123 \\
+DINOv2 ViT-S+reg & Transformer & 0.760 & 0.770 & 0.666 & 0.840 & 0.850 & 0.201 \\
+DINOv2 ViT-S & Transformer & 0.760 & 0.769 & 0.734 & 0.825 & \textbf{0.905} & 0.137 \\
+EfficientNet-B0 & CNN & 0.780 & 0.768 & 0.766 & 0.716 & 0.874 & 0.153 \\
+MobileNetV3-L & CNN & 0.720 & 0.721 & 0.683 & 0.806 & 0.871 & 0.200 \\
+ResNet50 & CNN & 0.720 & 0.715 & \textbf{0.876} & 0.764 & 0.874 & 0.167 \\
+\midrule
+Best-per-head oracle & --- & 0.840 & 0.840 & 0.876 & 0.857 & 0.905 & 0.058 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The benchmark supports four observations. First, ConvNeXt-S leads the single backbones on the primary material task, with accuracy 0.840 and macro-F1 0.840, tying the fusion ensemble on both measures. Second, the larger DINOv2 ViT-B closes much of the material gap (F1 0.818) and is the best-calibrated single backbone (ECE 0.071); the vision-language SigLIP ViT-B reaches F1 0.814, while plain DINOv2 ViT-S and its register-token variant reach 0.769 and 0.770. Third, fusion provides complementary gains: combining ConvNeXt-S, ConvNeXt-T, ResNet50, and DINOv2 ViT-B attains the best threat QWK (0.857) and the lowest material ECE (0.058), while matching the best material performance. Its threat advantage over ConvNeXt-S is 0.031, whereas the route gain is only 0.0003 and the condition AUROC gain is 0.0097. Fourth, the per-head winners remain spread across models: route favors ResNet50, threat favors fusion, and condition favors DINOv2 ViT-S. ConvNeXt-S therefore provides a material-focused shared-trunk choice, while the ensemble quantifies the headroom of a heavier combination. Figure~\ref{fig:backbones} shows these rankings graphically for each head.
+
+The accuracy gains of fusion must also be weighed against model size (Figure~\ref{fig:efficiency}). ConvNeXt-S contains approximately 50.25 million learned-state elements, compared with 189.15 million for fusion, a $3.76\times$ increase. The single trunk thus provides the same material performance with a substantially smaller model. Classifier inference latency remains to be measured under a common hardware and inference setting.
+
+These rankings are examined with paired statistics on the shared test items: a paired bootstrap of the material macro-F1 difference with $10{,}000$ item resamples and an exact McNemar test on material correctness. Against ResNet50, ConvNeXt-S has a macro-F1 difference of $+0.125$ with a $95\%$ confidence interval of $[0.023,\,0.259]$; against DINOv2 ViT-S, the difference is $+0.070$ with interval $[0.013,\,0.141]$. The corresponding McNemar $p$-values are 0.070 and 0.125. Macro-F1 and paired correctness assess different aspects of performance, so the bootstrap result does not imply significance under both tests. Fusion and ConvNeXt-S make identical material predictions on these items. With only 50 test items and no multiple-comparison adjustment, selection rests on the primary-task point estimates and the simpler single-trunk design rather than a claim of universal statistical superiority.
+
+A final control examines whether four-head sharing is bought at the primary task's expense. The same ConvNeXt-S backbone was retrained with a material-only objective, with the route, condition, and threat losses switched off. It reaches the same item-level material accuracy and macro-F1 (0.840 and 0.840) as the four-head model. Sharing one backbone therefore adds the three additional outputs without a measurable material-score penalty on this split, supporting the practical value of the multi-task design.
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}{0.48\textwidth}\centering\figorbox{figures/cls_compare_material_f1.png}\caption{Material macro-F1}\end{subfigure}\hfill
+    \begin{subfigure}{0.48\textwidth}\centering\figorbox{figures/cls_compare_threat_qwk.png}\caption{Threat QWK}\end{subfigure}
+
+    \vspace{0.5em}
+    \begin{subfigure}{0.48\textwidth}\centering\figorbox{figures/cls_compare_route_f1.png}\caption{Route macro-F1}\end{subfigure}\hfill
+    \begin{subfigure}{0.48\textwidth}\centering\figorbox{figures/cls_compare_condition_auroc.png}\caption{Condition AUROC}\end{subfigure}
+    \caption{Backbone comparison per head.}
+    \label{fig:backbones}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \figorbox[0.95\linewidth]{figures/efficiency_tradeoff.png}
+    \caption{Deployed ConvNeXt-S versus the four-backbone fusion: learned-state size and per-head performance differences. Fusion gains 0.031 threat QWK with $3.76\times$ the learned-state elements; inference latency remains unmeasured.}
+    \label{fig:efficiency}
+\end{figure}
+
+\section{Headline Results: Deployed Model and Cross-Validated Robustness}
+The deployed model is evaluated on the held-out 50-item test split, and its robustness is examined through pooled out-of-fold predictions for 457 items from the earlier dataset. Bootstrap $95\%$ confidence intervals are computed with $5{,}000$ item resamples. The two evaluations answer complementary questions: the test split measures the selected model, while the out-of-fold evaluation provides a broader view of performance across items. Table~\ref{tab:headline} reports both, and Figure~\ref{fig:kfoldci} overlays the deployed model's scores on the cross-validated confidence intervals.
+
+\begin{table}[!h]
+\centering
+\caption{Headline metrics of ConvNeXt-S and the cross-validated robustness check. Classifier test metrics use oracle crops; decision test metrics use the integrated pipeline.}
+\label{tab:headline}
+\small\setlength{\tabcolsep}{5pt}
+\begin{tabularx}{\linewidth}{@{}Ycc@{}}
+\toprule
+\textbf{Metric} & \textbf{Deployed (test, n=50)} & \textbf{OOF (n=457) [95\% CI]} \\
+\midrule
+Material accuracy & 0.840 & 0.832 [0.797, 0.864] \\
+Material macro-F1 & 0.840 & 0.803 [0.760, 0.841] \\
+Material ECE & 0.110 & 0.036 \\
+Condition AUROC & 0.865 & 0.821 [0.782, 0.857] \\
+Route macro-F1 & 0.740 & 0.675 [0.608, 0.735] \\
+Threat QWK & 0.826 & 0.771 [0.708, 0.831] \\
+Hazard recall (Special or review) & 0.824 (14/17) & \textbf{0.888 [0.838, 0.933]} (150/169) \\
+Strict Special-routing recall & 0.824 (14/17) & 0.876 (148/169) \\
+Automatic-decision coverage & 1.000 & 0.961 (439/457) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[!ht]
+    \centering
+    \figorbox{figures/kfold_ci.png}
+    \caption{Cross-validated metrics (457-item out-of-fold pool, $95\%$ confidence intervals) with the deployed model's 50-item test scores overlaid.}
+    \label{fig:kfoldci}
+\end{figure}
+
+The two evaluations show similar material and threat performance. The deployed model's material accuracy and macro-F1 (both 0.840) lie inside the cross-validated intervals, as does its threat QWK (0.826). Its condition AUROC (0.865) and route macro-F1 (0.740) lie slightly above the respective interval endpoints. Because the two evaluations use different item pools and fitted models, these differences are interpreted as complementary estimates rather than attributed solely to training-set size. Material calibration is strong in the pooled evaluation (ECE 0.036), although condition ECE is higher at 0.211.
+
+Most importantly, the earlier policy evaluation achieves hazard recall 0.888 [0.838, 0.933] over 169 hazardous items: 148 are routed to Special and two are referred for review. Strict Special-routing recall is 0.876, with 19 hazardous items receiving ordinary routes. Overall coverage is 0.961, since 18 of 457 items are deferred. The policy uses unscaled probabilities and the most probable threat class. Its total decision cost is 459, or 1.004 per item [0.685, 1.363]; referrals contribute no automatic-routing cost, so this result is read alongside coverage. The held-out pipeline routes 14 of 17 hazardous items to Special (recall 0.824) with no referrals. These outcomes show the benefit and remaining limits of prediction-based safety routing.
+
+\subsection{Per-Class Material Performance}
+Table~\ref{tab:perclass} reports the cross-validated per-class material F1. Eight of the ten classes exceed F1 0.80, led by battery (0.917). The weakest classes are composite (0.513) and hazardous\_chemical (0.634), with 21 items each in the 457-item evaluation. These class supports belong to the earlier evaluation, while the expanded dataset contains 34 composite and 36 hazardous-chemical items. Their errors are analyzed in Section~\ref{sec:rareclass}.
+
+\begin{table}[!h]
+\centering
+\caption{Cross-validated per-class material F1 and support (457-item evaluation).}
+\label{tab:perclass}
+\begin{tabular}{lcc|lcc}
+\toprule
+\textbf{Class} & \textbf{F1} & \textbf{n} & \textbf{Class} & \textbf{F1} & \textbf{n} \\
+\midrule
+battery & 0.917 & 47 & textile & 0.875 & 26 \\
+paper & 0.876 & 50 & glass & 0.885 & 60 \\
+e\_waste & 0.833 & 30 & metal & 0.857 & 54 \\
+sharps & 0.829 & 41 & plastic & 0.813 & 107 \\
+composite & 0.513 & 21 & hazardous\_chemical & 0.634 & 21 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Confusion Matrices and ROC Curves}
+The cross-validated confusion matrices for all four heads are shown in Figure~\ref{fig:confusion}, and the ROC curves for condition and route in Figure~\ref{fig:roc}. Material confusion is concentrated in composite and hazardous chemical, which are often mistaken for their visible constituent materials. Threat confusion is strongly diagonal: 382 of 457 predictions are correct, with 58 one-level and 17 two-level errors. The plot displays levels 1--3 because level 0 has no examples in this evaluation. Binary condition errors are similar in both directions (158 of 221 Good and 179 of 236 Poor items correct, accuracy 0.737). The route curves add an important nuance to its lower macro-F1: one-vs-rest AUROCs are Reuse 0.922, Recycle 0.888, Landfill 0.930, and Special 0.949. The head ranks routes well, but committing to one label under imbalance remains difficult, particularly for the 14-item Reuse class (F1 0.389) and the Recycle/Landfill boundary.
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}{0.49\textwidth}\centering\figorbox{figures/confusion_material.png}\caption{Material}\end{subfigure}\hfill
+    \begin{subfigure}{0.49\textwidth}\centering\figorbox{figures/confusion_route.png}\caption{Route}\end{subfigure}
+
+    \vspace{0.7em}
+    \begin{subfigure}{0.49\textwidth}\centering\figorbox{figures/confusion_threat.png}\caption{Threat}\end{subfigure}\hfill
+    \begin{subfigure}{0.49\textwidth}\centering\figorbox{figures/confusion_condition.png}\caption{Condition}\end{subfigure}
+    \caption{Cross-validated confusion matrices for the four task heads.}
+    \label{fig:confusion}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}{0.48\textwidth}\centering\figorbox{figures/condition_roc.png}\caption{Condition (Good vs Poor)}\end{subfigure}\hfill
+    \begin{subfigure}{0.48\textwidth}\centering\figorbox{figures/route_roc.png}\caption{Route (one-vs-rest)}\end{subfigure}
+    \caption{ROC curves for the condition and route heads.}
+    \label{fig:roc}
+\end{figure}
+
+\subsection{Calibration and Training Behaviour}
+Figure~\ref{fig:calib} (left) shows the material reliability diagram over the cross-validated pool, with ECE 0.036, matching Table~\ref{tab:headline}. The right panel shows the effect of validation-fitted temperature scaling on the earlier three-backbone fusion. It is most effective for condition: a temperature of about 3.52 reduces test ECE from 0.219 to 0.112. Material remains at 0.114 with temperature 1, and route changes only slightly (0.189373 to 0.188798, both rounded to 0.189) with temperature about 1.00. Threat scaling uses three cut-point temperatures [0.500, 2.644, 3.307] and increases ECE from 0.087 to 0.102. Calibration therefore benefits some heads more than others, reinforcing the need to assess each head separately before its confidence is used for routing or abstention.
+
+Figure~\ref{fig:curves} shows the training behavior of the selected ConvNeXt-S backbone. The left panel plots the weighted multi-task training loss, which falls from 3.213 to 0.374 and stabilizes after approximately six epochs. The right panel plots item-level validation metrics for all four heads. The checkpoint is chosen by the composite score $0.4 \cdot \text{route F1} + 0.4 \cdot \text{threat QWK} + 0.2 \cdot \text{material F1}$, which first peaks at epoch index 10 (dashed line). Later training does not consistently improve these metrics, while validation loss rises from 2.612 to 3.375. EMA weights and early stopping therefore support model selection before continued fitting increases the gap between training and validation behavior.
+
+\begin{figure}[!ht]
+    \centering
+    \figorbox{figures/calibration_reliability.png}
+    \caption{Cross-validated material reliability and per-head ECE before/after temperature scaling of the earlier three-backbone fusion.}
+    \label{fig:calib}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \figorbox{figures/convnext_s_training_curves.png}
+    \caption{Multi-task training loss and per-head validation metrics of ConvNeXt-S.}
+    \label{fig:curves}
+\end{figure}
+
+\section{Detection and End-to-End Performance}
+\subsection{Detector Benchmark}
+To justify the choice of detector empirically, six detectors, five modern YOLO variants at the same small scale and the transformer-based RT-DETR-L, were trained under a common budget (60 epochs, $640\times640$ input, batch 16, the same item split and seed) and evaluated on the held-out test split. Table~\ref{tab:det_compare} reports accuracy, model size, and measured inference latency.
+
+\begin{table}[!h]
+\centering
+\caption{Detector comparison on the held-out test split; best per column in bold.}
+\label{tab:det_compare}
+\footnotesize\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lccccccc}
+\toprule
+\textbf{Detector} & \textbf{P} & \textbf{R} & \textbf{F1} & \textbf{mAP@50} & \textbf{mAP@50:95} & \textbf{Par.\ (M)} & \textbf{ms/img} \\
+\midrule
+YOLOv12-s & 0.985 & \textbf{0.986} & 0.986 & \textbf{0.992} & \textbf{0.857} & 9.3 & 12.8 \\
+YOLOv9-s & 0.956 & 0.968 & 0.962 & 0.979 & 0.849 & \textbf{7.3} & 10.8 \\
+\textbf{YOLO11-s (ours)} & \textbf{0.989} & 0.985 & \textbf{0.987} & 0.991 & 0.846 & 9.5 & 9.2 \\
+YOLOv10-s & 0.974 & 0.966 & 0.970 & 0.984 & 0.837 & 8.1 & \textbf{9.0} \\
+YOLOv8-s & 0.971 & 0.981 & 0.976 & 0.989 & 0.825 & 11.2 & 9.3 \\
+RT-DETR-L (Transf.) & 0.872 & 0.904 & 0.888 & 0.905 & 0.738 & 33.0 & 39.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Three conclusions follow. First, all five YOLO variants achieve high mAP@50 (0.979--0.992) in the single-item setting, making strict-IoU accuracy, F1, and latency useful discriminators. Second, YOLO11-s offers a favorable joint trade-off: the highest F1 (0.987) and precision (0.989), mAP@50 0.991, and mAP@50-95 0.846, within 0.011 of YOLOv12-s. Its latency is about 29\% lower than YOLOv12-s (9.2 versus 12.8 ms), while YOLOv10-s is only marginally faster (9.0 ms) with lower F1 0.970. Third, RT-DETR-L trails the YOLO candidates in this experiment, with mAP@50-95 0.738 at 39.1 ms per image. The choice of YOLO11 is therefore supported by the measured accuracy--speed balance among the tested configurations.
+
+\subsection{Deployed Detector and End-to-End Cost}
+Re-evaluated on the expanded test split (50 items, 221 views), the deployed single-class YOLO11 detector reaches mAP@50 0.992, mAP@50-95 0.853, precision 0.978, and recall 0.989. At confidence threshold 0.25 it returns a detection for every test view, giving detection rate 1.0. Figure~\ref{fig:detcurves} shows precision--recall and confidence curves from an earlier detector evaluation, with displayed mAP@50 0.995; the expanded-split metrics are reported separately above. Detection rate indicates whether a box is returned, while IoU-based recall also measures whether the box sufficiently overlaps the object.
+
+Running the full pipeline end-to-end (detect $\rightarrow$ crop $\rightarrow$ classify) produces the same material accuracy and macro-F1 as oracle ground-truth crops (both 0.840) on the paired 50-item evaluation (Figure~\ref{fig:e2e}). This crop comparison uses base inference without temperature scaling for both inputs, whereas the ConvNeXt-S backbone benchmark averages original and horizontally flipped crops. Threat QWK is also unchanged at 0.826. The other heads show small localization costs: route macro-F1 falls from 0.740 to 0.724, and condition AUROC from 0.866 to 0.863. The detector therefore preserves the material result in this experiment, while its effect on downstream performance remains task-dependent.
+
+Table~\ref{tab:e2esep} separates the two models' standalone performance from the integrated pipeline. The detector and classifier are evaluated on their respective tasks, while the paired oracle-versus-detector crop comparison makes the cost of chaining them explicit.
+
+\begin{table}[!h]
+\centering
+\caption{Separate-model outcomes versus the integrated end-to-end pipeline.}
+\label{tab:e2esep}
+\begin{tabularx}{\linewidth}{@{}p{3.9cm} l Y@{}}
+\toprule
+\textbf{Configuration} & \textbf{Evaluation} & \textbf{Result} \\
+\midrule
+YOLO11 detector (Stage 1, standalone) & test & mAP@50 0.992; mAP@50-95 0.853; precision 0.978; recall 0.989 \\
+\addlinespace[4pt]
+ConvNeXt-S classifier (Stage 2, oracle crops) & pooled CV & material acc 0.832, macro-F1 0.803; threat QWK 0.771; route F1 0.675; condition AUROC 0.821 \\
+\addlinespace[4pt]
+End-to-end (Stage 1 $\rightarrow$ Stage 2) & test split & material acc 0.840 vs 0.840 oracle; route F1 0.724 vs 0.740; detection rate 1.0 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}{0.48\textwidth}\centering\figorbox{figures/detection_PR.png}\caption{Precision--Recall}\end{subfigure}\hfill
+    \begin{subfigure}{0.48\textwidth}\centering\figorbox{figures/detection_F1.png}\caption{F1--Confidence}\end{subfigure}
+
+    \vspace{0.7em}
+    \begin{subfigure}{0.48\textwidth}\centering\figorbox{figures/detection_P.png}\caption{Precision--Confidence}\end{subfigure}\hfill
+    \begin{subfigure}{0.48\textwidth}\centering\figorbox{figures/detection_R.png}\caption{Recall--Confidence}\end{subfigure}
+    \caption{Earlier YOLO11 detector evaluation: precision--recall, F1--confidence, precision--confidence, and recall--confidence curves.}
+    \label{fig:detcurves}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \figorbox[0.82\linewidth]{figures/end_to_end.png}
+    \caption{End-to-end material accuracy versus an oracle crop.}
+    \label{fig:e2e}
+\end{figure}
+
+\section{External Validation}
+To assess generalization beyond the in-house data, material classification is evaluated on public TrashNet \cite{trashnet} and the detector is stress-tested on TACO \cite{taco}. The TrashNet experiments use a ResNet50 material classifier. Zero-shot transfer reaches accuracy 0.695 and macro-F1 0.632 on 476 images when predictions are restricted to the four overlapping classes (glass, metal, paper, plastic); using the full ten-way output gives accuracy 0.439. A separate six-class fine-tuning experiment reaches accuracy 0.889 and macro-F1 0.861 on 503 test images; this result is exploratory because checkpoint selection used the evaluation split. Figure~\ref{fig:extval} shows both results, with their class spaces and test subsets identified, so the difference is interpreted as two transfer settings rather than a paired gain.
+
+TACO's cluttered multi-object scenes lie outside the single-item capture setting used for detector training. On 300 TACO images, mAP@50 is 0.096, mAP@50-95 is 0.045, precision is 0.299, and recall is 0.145. This substantial reduction identifies a generalization boundary of the current system and motivates broader scene data and further detector adaptation. The external experiments test material recognition and localization; evaluation of the custom threat and routing labels remains an internal study.
+
+\begin{figure}[!ht]
+    \centering
+    \figorbox[0.82\linewidth]{figures/external_validation.png}
+    \caption{Material transfer to TrashNet under restricted four-way zero-shot and six-way fine-tuned evaluation.}
+    \label{fig:extval}
+\end{figure}
+
+\section{Multi-View Aggregation}
+\label{sec:viewagg}
+An item is photographed from several angles, and its final prediction must combine the evidence from those views. The default averages logits before applying the output activation. Table~\ref{tab:viewagg} compares this choice with six alternative parameter-free rules on the same 457 cross-validated items, and Figure~\ref{fig:viewagg} visualizes their accuracy and threat-sensitivity trade-offs. For this comparison, threat is decoded as the most probable CORN class, whereas the headline evaluation uses the ordinal median obtained by counting cumulative probabilities above 0.5. This explains the mean-logit QWK of 0.778 here versus 0.771 in Table~\ref{tab:headline}. Threat-threshold recall is measured over the 327 items with true threat $\geq 2$, and false-positive rate over the remaining 130 items; these measures concern the threat head rather than the final disposal decision.
+
+\begin{table}[!h]
+\centering
+\caption{Multi-view aggregation on 457 cross-validated items, with mode threat decoding. Threat recall and FPR use threshold $\geq 2$; best per column in bold.}
+\label{tab:viewagg}
+\footnotesize\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Aggregation} & \textbf{mat F1} & \textbf{route F1} & \textbf{QWK} & \textbf{thr.\ rec.} & \textbf{thr.\ FPR} \\
+\midrule
+mean-logit (default) & \textbf{0.803} & 0.675 & 0.778 & 0.933 & \textbf{0.108} \\
+mean-prob & 0.795 & 0.691 & 0.778 & 0.930 & \textbf{0.108} \\
+conf.-weighted & 0.798 & 0.692 & 0.773 & 0.927 & \textbf{0.108} \\
+best-view & 0.779 & \textbf{0.697} & 0.771 & 0.927 & \textbf{0.108} \\
+median-logit & 0.801 & 0.669 & \textbf{0.783} & 0.942 & \textbf{0.108} \\
+log-sum-exp & 0.785 & 0.694 & 0.760 & 0.982 & 0.208 \\
+max / noisy-OR & 0.778 & 0.694 & 0.732 & \textbf{0.988} & 0.269 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Mean logits gives the highest material macro-F1 (0.803), while median logits gives the highest threat QWK (0.783). Best-view selection raises route F1 to 0.697 but reduces material F1 to 0.779. Max/noisy-OR is the most sensitive to threat, raising threshold recall from 0.933 to 0.988, but its false-positive rate increases from 0.108 to 0.269 and QWK falls to 0.732. Log-sum-exp offers an intermediate recall/false-alarm trade-off. The default mean-logit rule therefore provides a useful balance for joint prediction, while a more sensitive rule may be appropriate when missing a high-threat item carries a greater cost than unnecessary special handling.
+
+\begin{figure}[!ht]
+    \centering
+    \figorbox[0.85\linewidth]{figures/view_aggregation_plot.png}
+    \caption{Multi-view aggregation: material macro-F1 and threat QWK (left), and threat recall versus false-positive rate at level $\geq 2$ (right). Numbered labels identify the aggregation methods.}
+    \label{fig:viewagg}
+\end{figure}
+
+\section{Interpretability and Qualitative Results}
+\label{sec:qualitative}
+Aggregate metrics are complemented by Grad-CAM saliency maps and end-to-end walkthroughs, which make the model's behavior on individual items easier to inspect.
+
+Figure~\ref{fig:gradcam} shows six representative examples, with the original image, material-head saliency, and threat evidence arranged by column. Battery, glass, and sharps are recognized with displayed view confidences of 0.98, 1.00, and 0.99. The correctly classified composite coffee cup (0.99) draws attention to the cup and printed logo, while some maps also emphasize surrounding regions. The chemical container illustrates a harder case: its plastic appearance leads to a plastic prediction at 0.50 on the displayed view. Across its views, the item-level prediction is plastic with confidence 0.991 and a Recycle decision despite the true Special route. This error shows why visual material alone is insufficient for chemical waste and motivates additional cues such as warning text and hazard pictograms.
+
+\begin{figure}[!ht]
+    \centering
+    \figorbox[0.7\linewidth]{figures/gradcam_grid.png}
+    \caption{Grad-CAM examples: original image, material-head saliency with view confidence, and threat evidence.}
+    \label{fig:gradcam}
+\end{figure}
+
+Figure~\ref{fig:qualdemo} traces three test items through detection, cropping, classification, multi-view aggregation, and routing. The battery has five views and is assigned threat 3 rather than the true level 2, yet the final Special route is correct. The poor-condition glass item has four views and is correctly sent to Special, while the composite carton has five views and is correctly sent to Landfill. Together, the examples illustrate how condition, material, and threat contribute to disposal decisions, and how a one-level threat error need not change the final route.
+
+\begin{figure}[!ht]
+    \centering
+    \figorbox[0.95\linewidth]{figures/qualitative_demo.png}
+    \caption{End-to-end pipeline walkthrough: detection, crop, and the final routing decision.}
+    \label{fig:qualdemo}
+\end{figure}
+
+\section{Rare-Class Analysis}
+\label{sec:rareclass}
+Composite and hazardous\_chemical are the weakest material classes in the cross-validated evaluation, with F1 values of 0.513 and 0.634 and 21 items each. Table~\ref{tab:rareconf} shows their main confusions. Composite is most often mistaken for plastic or paper, its visible constituents, while hazardous chemical is confused with the ordinary material of its container. The expanded dataset now contains 34 composite and 36 hazardous-chemical items, but the reported cross-validated results concern the earlier pool. These classes remain priorities for targeted collection and improved recognition of cues that distinguish the item's contents or construction from its outward material.
+
+\begin{table}[!h]
+\centering
+\caption{Cross-validated confusion for the two weakest material classes.}
+\label{tab:rareconf}
+\begin{tabularx}{\linewidth}{@{}l c Y@{}}
+\toprule
+\textbf{True class} & \textbf{Correct} & \textbf{Confused as (counts)} \\
+\midrule
+hazardous\_chemical (n=21) & 13 & plastic 3, metal 2, glass 1, battery 1, composite 1 \\
+composite (n=21) & 10 & plastic 6, paper 3, e\_waste 2 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The decision layer can contain some material errors by using the other task outputs. Among the 21 hazardous-chemical items, 13 are correctly classified by material (recall 0.619), while 15 are routed to Special or referred for review (0.714). This is still below the pooled review-inclusive hazard recall of 0.888 over all 169 Special-route items. The chemical examples routed to Recycle or Landfill show the remaining difficulty: a hazardous container can resemble ordinary packaging while attracting a confident prediction. OCR of warning text, hazard pictograms, and resin codes offers a promising direction for addressing these errors.
+
+\section{Discussion and Comparison with Related Work}
+Table~\ref{tab:compare} positions the proposed system against the reference points reviewed in Chapter~2. The comparison provides context across material classification, detection, routing, and hazardous handling; differences in datasets, label spaces, and metrics must be considered when interpreting the values.
+
+\begin{table}[!h]
+\centering
+\caption{Comparison with published reference points.}
+\label{tab:compare}
+\begin{tabularx}{\linewidth}{@{}p{2.9cm} Y Y@{}}
+\toprule
+\textbf{Task} & \textbf{Published reference} & \textbf{This work} \\
+\midrule
+Material classification & Garbage-12: EfficientNet-B0 86\%, ResNet50 $\sim$88\% \cite{garbage12} & acc 0.832 / macro-F1 0.803 (457-item pooled CV) \\
+\addlinespace[5pt]
+Material (clean studio) & TrashNet: GoogLeNet 97.9\%, ResNet50+SVM 87\% \cite{trashnet} & fine-tuned acc 0.889 (6 classes, 503 images); zero-shot restricted acc 0.695 (4 classes, 476 images) \\
+\addlinespace[5pt]
+Waste detection (mAP) & YOLOv8-based $\sim$89.5\% mAP \cite{hybridyolocnn} & YOLO11 mAP@50 0.992 / mAP@50-95 0.853 \\
+\addlinespace[5pt]
+Recyclability / route & MHS $>$90\% (binary recyclable/other) \cite{mhs} & 4-class route acc 0.759 / macro-F1 0.675 (different target) \\
+\addlinespace[5pt]
+Hazardous handling & flat 4-class incl.\ hazardous $\sim$65.8\% \cite{maskscoringwaste} & threat QWK 0.771; strict Special recall 0.876, or 0.888 including review \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Three aspects distinguish the experimental setting. First, task granularity is greater: the system predicts ten materials and four disposal routes alongside condition and ordinal threat, whereas several reference systems address material or binary recyclability alone. Second, evaluation is performed at the physical-item level, keeping different views of an item in one split, and includes both held-out and cross-validated results. Third, a single shared backbone supports all four outputs; the material-only control reaches the same material score on the held-out split. External TrashNet evaluation complements the internal experiments, while the low TACO detection result shows the need for further adaptation to cluttered scenes. The contribution is therefore the joint treatment of material, condition, route, and ordered threat, together with a decision layer that connects these predictions to handling actions.
+
+\section{Conclusion}
+The selected ConvNeXt-S reaches material accuracy and macro-F1 of 0.840 on 50 held-out items, while pooled cross-validation over 457 items gives accuracy 0.832 and macro-F1 0.803. Detector crops preserve the held-out material result, with small changes in route and condition performance. Strict Special-routing recall is 0.876 in the cross-validated decision evaluation, rising to 0.888 when review referrals count as safe diversion. The experiments also identify the principal areas for improvement: rare-material recognition, route imbalance, per-head calibration, and generalization to cluttered scenes. The next chapter concludes the thesis.

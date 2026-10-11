@@ -1,0 +1,20 @@
+{
+  "baseline": {
+    "total_cost": 67.0,
+    "coverage": 1.0,
+    "hazard_recall": 0.8235294117647058,
+    "n": 50
+  },
+  "reconciled": {
+    "total_cost": 66.0,
+    "coverage": 1.0,
+    "hazard_recall": 0.8235294117647058,
+    "n": 50,
+    "route_conflicts": 1,
+    "threat_conflicts": 3,
+    "mean_confidence": 0.749,
+    "threat_recon_mae": 0.2,
+    "high_conf_route_acc": 0.96,
+    "low_conf_route_acc": 0.56
+  }
+}

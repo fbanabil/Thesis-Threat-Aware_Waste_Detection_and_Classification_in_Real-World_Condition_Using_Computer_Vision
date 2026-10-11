@@ -1,0 +1,78 @@
+% CUET CSE THESIS FINAL REPORT FORMAT
+% @version     1.0
+
+% The document class
+\documentclass{cuetcsethesis}
+
+% Custom packages to include
+\input{resources/packages}
+
+% Total information regarding the thesis
+\input{resources/thesis-details}
+
+% Adding a Bib resource file
+\input{resources/bib-setup}
+
+% No List of Abbreviations: the class prints one via \thesisTOA (glossaries pkg);
+% override it to a no-op instead of touching cuetcsethesis.cls.
+\renewcommand{\thesisTOA}{}
+
+% Add list entries at their heading, so multi-page lists link to their first page.
+\makeatletter
+\patchcmd{\listoffigures}{\@starttoc{lof}}{\addcontentsline{toc}{chapter}{\listfigurename}\@starttoc{lof}}{}{\PackageError{report}{Could not synchronize the figures-list entry}{Check the document class definition of listoffigures.}}
+\patchcmd{\listoftables}{\@starttoc{lot}}{\addcontentsline{toc}{chapter}{\listtablename}\@starttoc{lot}}{}{\PackageError{report}{Could not synchronize the tables-list entry}{Check the document class definition of listoftables.}}
+\makeatother
+\renewcommand{\thesisTOF}{\iftotalfigures\cleardoublepage\listoffigures\fi}
+\renewcommand{\thesisTOT}{\iftotaltables\cleardoublepage\listoftables\fi}
+
+
+\begin{document}
+
+% start of document
+
+% Create the title page, which is two page in this format.
+\maketitle
+
+% Certification page
+\certification
+
+% Declaration of originality
+\input{chapters/declaration}
+
+% Acknowledgements
+\input{chapters/acknowledgements}
+
+% The abstract of the thesis
+\input{chapters/abstract}
+
+% Print out the table of tables and table of figures
+\thesisTables
+
+% start of thesis body
+\thesisBodyStart
+
+% Include introduction
+\chapter{Introduction}
+\input{chapters/introduction}
+
+% Include Literature Review
+\chapter{Literature Review}
+\input{chapters/literature-review}
+
+% Include Methodology
+\chapter{Methodology}
+\input{chapters/methodology}
+
+% Include Experimental Results and Analysis
+\chapter{Results and Discussions}
+\input{chapters/result-analysis}
+
+% Conclusion
+\chapter{Conclusion}
+\input{chapters/conclusion}
+
+% end of thesis body
+
+% Print the references
+\printReferences
+\end{document}

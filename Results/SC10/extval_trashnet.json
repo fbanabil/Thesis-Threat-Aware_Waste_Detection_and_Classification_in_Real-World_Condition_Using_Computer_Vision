@@ -1,0 +1,21 @@
+{
+  "backbone": "resnet50",
+  "n_images": 476,
+  "overlap_classes": [
+    "glass",
+    "metal",
+    "paper",
+    "plastic"
+  ],
+  "acc_full_10way": 0.4391,
+  "acc_restricted_4way": 0.6954,
+  "macro_f1_restricted": 0.632,
+  "out_of_overlap_predictions": {
+    "battery": 78,
+    "composite": 55,
+    "sharps": 38,
+    "hazardous_chemical": 24,
+    "e_waste": 7,
+    "textile": 6
+  }
+}

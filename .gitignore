@@ -1,0 +1,53 @@
+# Python and Jupyter caches
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Local editor and operating-system files
+.vscode/
+.idea/
+.cph/
+.DS_Store
+Thumbs.db
+
+# Keep cached logits and model checkpoints out of the GitHub results package
+/Results/**/*logit*
+/Results/**/*.pt
+/Results/**/*.pth
+/Results/**/*.ckpt
+
+# Generated dataset preparation and model-download metadata
+/Results/**/*.cache
+/Results/**/__huggingface_repos__.json
+/Results/SC10/taco_sc/
+
+# LaTeX build output (keep report source and exported experiment results)
+/Report/*.aux
+/Report/*.bbl
+/Report/*.bbl-*
+/Report/*.bcf
+/Report/*.blg
+/Report/*.fdb_latexmk
+/Report/*.fls
+/Report/*.lof
+/Report/*.log
+/Report/*.lot
+/Report/*.out
+/Report/*.pdf
+/Report/*.run.xml
+/Report/*.synctex.gz
+/Report/*.synctex.gz(busy)
+/Report/*.synctex
+/Report/*.synctex(busy)
+/Report/*.toc
+/Report/*.xdv
+/Report/*.acn
+/Report/*.acr
+/Report/*.alg
+/Report/*.glg
+/Report/*.glo
+/Report/*.gls
+/Report/*.ist
+/Report/_build/

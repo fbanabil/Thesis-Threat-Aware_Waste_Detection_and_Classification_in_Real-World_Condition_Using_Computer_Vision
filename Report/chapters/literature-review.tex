@@ -1,0 +1,96 @@
+\section{Introduction}
+Automated waste recognition has progressed from hand-engineered image-processing pipelines to end-to-end deep learning, and from coarse two-way recyclability decisions to fine-grained material taxonomies and in-context detection. This chapter surveys that progression along the dimensions most relevant to the present work. Section~2 reviews deep learning for waste material classification and the benchmark datasets that anchor it. Section~3 examines object detection for waste in cluttered scenes and the evolution of the single-stage detectors on which this thesis builds. Section~4 catalogues the public datasets that define the field. Section~5 discusses two-stage and multi-signal systems, the architectural family this work belongs to. Section~6 turns to the comparatively neglected problem of hazardous and safety-aware handling, and Section~7 to the modelling tools, ordinal regression and calibration, that this thesis uses to treat threat as a first-class output. Section~8 summarizes the reviewed works, Section~9 distills their common limitations into the research gap, and Section~10 defines the terminology used throughout the report.
+
+\section{Deep Learning for Waste Material Classification}
+The classification of a waste item by its constituent material is the most studied sub-problem in the field. Early systems relied on hand-crafted descriptors (colour histograms in RGB or HSV space, texture descriptors such as Local Binary Patterns, and shape features) fed to classical classifiers like Support Vector Machines. While interpretable and cheap, such pipelines are brittle under the lighting, soiling, and background variation of real disposal scenes, and they require careful manual feature engineering for each new material.
+
+The shift to convolutional neural networks (CNNs) removed the need for hand-crafted features by learning hierarchical representations directly from pixels. Deep residual networks (ResNet) \cite{resnet} made very deep models trainable through skip connections and remain a strong baseline; EfficientNet \cite{efficientnet} achieved comparable accuracy at a fraction of the parameters through principled compound scaling; and MobileNetV3 \cite{mobilenetv3} targeted mobile and edge deployment, which is directly relevant to a fielded sorting aid. More recently, ConvNeXt \cite{convnext} modernized the pure-convolutional design to match transformer accuracy, and Vision Transformers (ViT) \cite{vit}, together with self-supervised variants such as DINOv2 \cite{dinov2}, have shown that attention-based and label-free pretraining can yield highly transferable features. This thesis evaluates representatives of all of these families as interchangeable backbones.
+
+In the specific domain of waste, transfer learning from ImageNet-pretrained backbones is the dominant recipe. On the six-class TrashNet benchmark \cite{trashnet}, fine-tuned networks reach very high accuracy: reported figures include GoogLeNet around 97.9\% and ResNet50-based pipelines around 87\%. On the larger and more varied twelve-class Garbage Classification dataset \cite{garbage12}, EfficientNet-B0 reaches roughly 86\% and ResNet50 roughly 88\%. These numbers bracket what a material classifier should achieve, but they are obtained on clean, well-lit, single-object images; accuracy on genuinely cluttered or degraded photographs is typically lower, and is rarely reported. Hybrid approaches that combine deep features with classical machine-learning classifiers have also been explored to squeeze additional accuracy from limited data \cite{hybridmlwaste}.
+
+\section{Object Detection for Waste in Context}
+Classification assumes the object has already been isolated; in practice a system must first locate the item. Object detectors fall into two families. Two-stage detectors (R-CNN and its successors) first propose candidate regions and then classify them, achieving high accuracy at the cost of speed. Single-stage detectors predict boxes and classes in one pass and are therefore far faster, which is essential for real-time sorting.
+
+The YOLO family epitomizes the single-stage approach. Since the original formulation that cast detection as a single regression problem \cite{yolo}, successive versions have steadily improved the accuracy--speed trade-off: YOLOv3 \cite{yolov3} introduced a stronger backbone and multi-scale prediction, and subsequent Ultralytics releases culminating in YOLO11 \cite{yolo11} added anchor-free detection, improved feature aggregation, and streamlined training. Recent application studies confirm the family's suitability for waste: improved YOLOv8-based detectors reach mean Average Precision in the high-eighties on curated garbage sets \cite{yolov8sci,hybridyolocnn}, and machine-vision systems built around such detectors have been deployed for automated garbage sorting \cite{wmsystem}. This thesis adopts YOLO11 as a single-class localizer so that the downstream classifier operates on a clean crop rather than a cluttered scene.
+
+\section{Public Datasets for Waste Recognition}
+Progress in the field is shaped by the available datasets, which differ markedly in scale, label granularity, and realism (Table~\ref{tab:datasets}). TrashNet \cite{trashnet} provides clean studio photographs and is the de-facto classification baseline, but its six classes and controlled conditions limit its realism. The twelve-class Garbage Classification set \cite{garbage12} is larger and more varied. For detection in context, TACO \cite{taco} annotates litter ``in the wild'' across beaches and streets, ZeroWaste \cite{zerowaste} targets deformable objects in heavily cluttered industrial streams, and WaRP \cite{warp} captures occlusion, poor lighting, and distortion at an operating recycling plant, making the latter two the closest public references to the real-world-condition setting pursued here. Notably, none of these datasets annotate handling threat or item condition, which is one motivation for the purpose-built dataset used in this work.
+
+\begin{table}[!h]
+\centering
+\caption{Representative public datasets for waste recognition.}
+\label{tab:datasets}
+\begin{tabularx}{\linewidth}{@{}l l >{\raggedright\arraybackslash}p{2.7cm} Y@{}}
+\toprule
+\textbf{Dataset} & \textbf{Scale / classes} & \textbf{Task} & \textbf{Characteristics} \\
+\midrule
+TrashNet \cite{trashnet} & $\sim$2.5k / 6 & classification & clean studio images; standard baseline \\
+\addlinespace[5pt]
+Garbage-12 \cite{garbage12} & $\sim$15k / 12 & classification & larger, more varied \\
+\addlinespace[5pt]
+TACO \cite{taco} & $\sim$1.5k / 60 & detection & litter in context (streets, beaches) \\
+\addlinespace[5pt]
+ZeroWaste \cite{zerowaste} & $>$1.8k frames & segmentation & deformable objects, heavy clutter \\
+\addlinespace[5pt]
+WaRP \cite{warp} & $>$10k / 28 & detection, classification, segmentation & occlusion, poor lighting, distortion \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Two-Stage and Multi-Signal Systems}
+A recurring and effective architecture is to decouple detection from classification: a detector localizes the object, and a separate, possibly more powerful, classifier categorizes the crop. This isolates the classifier from background clutter and lets each stage be optimized independently, precisely the design adopted in this thesis. Hybrid pipelines combining a YOLO detector with a downstream CNN classifier have been shown to handle complex backgrounds and varied object sizes well \cite{hybridyolocnn}.
+
+A complementary idea is to fuse multiple signals rather than rely on the image alone. The Multilayer Hybrid System of Chu et al.\ \cite{mhs} combines convolutional image features with additional numerical features through a multilayer perceptron to decide recyclability, exceeding 90\% on a binary recyclable-versus-other task. This is an early precedent for the multi-head philosophy of the present work, which predicts several interdependent attributes (material, condition, route, threat) from a shared representation rather than collapsing the decision into a single label.
+
+\section{Hazardous and Safety-Aware Waste Handling}
+Despite its practical importance, the safe handling of hazardous waste is markedly under-studied in the computer-vision literature. Most systems either exclude hazardous categories entirely or fold them into a flat multi-class scheme alongside ordinary materials. When an explicit hazardous category is included, performance remains challenging: prior work using an improved Mask Scoring R-CNN \cite{maskscoringwaste} over four categories including a hazardous class reports overall accuracy in the mid-sixties (around 65-66\%). The reviewed works do not jointly model handling severity as an ordered quantity and couple it to a disposal decision. A highly accurate material classifier can still be unsafe if it mistakes a chemical container or battery for ordinary recyclable waste. Addressing this gap through ordinal threat prediction and special-handling rules is a central contribution of this thesis.
+
+\section{Ordinal Regression and Model Calibration}
+Two modelling tools underpin the threat-aware design. First, threat severity is naturally ordinal: the levels are ordered, and a model should be penalized more for confusing ``low'' with ``high'' than ``low'' with ``moderate.'' Treating such a target as ordinary multi-class classification discards this ordering. CORAL \cite{coral} and its successor CORN \cite{corn} provide neural ordinal-regression formulations whose predicted ranks are guaranteed to be consistent, and which are evaluated with rank-aware metrics such as the Quadratic Weighted Kappa. This thesis uses CORN for its threat head.
+
+Second, for a system to abstain or defer responsibly, its confidence estimates must be trustworthy. Modern deep networks are known to be over-confident; Guo et al.\ \cite{guo2017} showed that simple post-hoc temperature scaling can reduce Expected Calibration Error while preserving multiclass predictions under a positive scalar temperature. Calibrated confidences support the confidence-aware reconciliation and Unsure option used in this work, and their quality is assessed separately for each head. This calibration step is rarely included in prior waste-recognition systems, despite its relevance to decisions that may require human review.
+
+\section{Summary of Related Work}
+Table~\ref{tab:related} consolidates the most relevant prior works, their approach, and their principal limitation with respect to the goals of this thesis.
+
+\begin{table}[!h]
+\centering
+\caption{Summary of representative related work.}
+\label{tab:related}
+\begin{tabularx}{\linewidth}{@{}p{3.0cm} Y Y@{}}
+\toprule
+\textbf{Work} & \textbf{Approach} & \textbf{Limitation w.r.t.\ this thesis} \\
+\midrule
+TrashNet baselines \cite{trashnet} & CNN transfer learning, 6 classes & clean studio images; no condition/threat \\
+\addlinespace[5pt]
+Garbage-12 baselines \cite{garbage12} & CNN transfer learning, 12 classes & curated images; material only \\
+\addlinespace[5pt]
+YOLO-based waste detectors \cite{yolov8sci,hybridyolocnn,wmsystem} & single-stage / hybrid detection & material/localization only; no safety output \\
+\addlinespace[5pt]
+MHS \cite{mhs} & CNN + MLP feature fusion & binary recyclable/other; no threat or condition \\
+\addlinespace[5pt]
+Hazardous multi-class (Mask Scoring R-CNN) \cite{maskscoringwaste} & flat 4-class incl.\ hazardous & threat as one flat class ($\sim$65.8\%); no ordinal severity \\
+\addlinespace[5pt]
+CORAL / CORN \cite{coral,corn} & rank-consistent ordinal regression & general method; not applied to waste threat \\
+\addlinespace[5pt]
+Calibration \cite{guo2017} & temperature scaling & general method; rarely used in waste systems \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Limitations of Existing Works}
+Across the reviewed literature, five recurring limitations define the research gap. First, most results are obtained on controlled images, leaving performance under soiling, breakage, occlusion, and uneven lighting insufficiently explored. Second, binary recyclability is too coarse for disposal decisions that must distinguish reuse, recycling, landfill, and special handling. Third, item condition is rarely modeled, although intact and broken glass can require different routes. Fourth, hazards are generally represented as a flat class, without ordered severity or an explicit connection to handling decisions. Finally, confidence calibration and a review option are often absent, which is particularly consequential for scarce safety-critical classes. The proposed two-stage, four-head system addresses these gaps through joint prediction, per-head calibration, and a regulation-grounded decision layer.
+
+\section{Terminologies}
+\begin{itemize}
+    \item \textbf{Material:} the substance an item is made of (ten classes in this work).
+    \item \textbf{Condition:} the physical state of the item, ``Good'' or ``Poor'' (soiled, broken, or degraded).
+    \item \textbf{Route:} the disposal decision, Reuse, Recycle, Landfill, or Special (hazardous/special handling).
+    \item \textbf{Threat level:} an ordinal severity score on the Litter Impact Index scale (0-3) \cite{lii}, capturing the harm an item poses to handlers and the environment.
+    \item \textbf{Backbone:} the shared feature-extraction network whose output feeds all four task heads.
+    \item \textbf{Calibration:} the alignment of predicted confidence with empirical accuracy, measured by the Expected Calibration Error.
+    \item \textbf{Hazard recall:} the fraction of ground-truth Special-route items sent to Special or referred for review; strict Special-routing recall counts only automatic Special decisions.
+\end{itemize}
+
+\section{Conclusion}
+The literature shows substantial progress in waste material classification and in-context detection, driven by public datasets and increasingly capable CNN and transformer backbones. It also reveals a gap between recognizing an object's material and deciding how it should be handled under real-world conditions. Joint modeling of material, condition, route, and ordered threat, supported by calibrated confidence and an explicit decision layer, offers a way to narrow that gap. The next chapter presents the methodology developed for this purpose.

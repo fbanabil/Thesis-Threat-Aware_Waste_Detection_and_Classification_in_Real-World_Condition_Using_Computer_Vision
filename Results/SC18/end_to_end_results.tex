@@ -1,0 +1,13 @@
+\begin{table}[t]
+\centering
+\caption{End-to-end pipeline vs the oracle-crop upper bound on the test split. Detect rate 1.000.}
+\label{tab:end_to_end}
+\begin{tabular}{lcccccc}
+\toprule
+Setting & Mat.\,Acc & Mat.\,F1 & Cond.\,AUROC & Route\,F1 & Threat\,QWK & Threat\,MAE \\
+\midrule
+Oracle crop (GT box) & 0.840 & 0.840 & 0.866 & 0.740 & 0.826 & 0.180 \\
+End-to-end (detected box) & 0.840 & 0.840 & 0.863 & 0.724 & 0.826 & 0.180 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,57 @@
+{
+  "views": [
+    "base",
+    "hflip",
+    "zoom",
+    "zoom_flip"
+  ],
+  "results": {
+    "val": {
+      "baseline": {
+        "material_acc": 0.72,
+        "material_f1": 0.7220912420912421,
+        "threat_qwk": 0.6214614878209348,
+        "route_f1": 0.8553571428571429,
+        "condition_auroc": 0.8701298701298701
+      },
+      "tta": {
+        "material_acc": 0.76,
+        "material_f1": 0.7605222555222555,
+        "threat_qwk": 0.6214614878209348,
+        "route_f1": 0.8553571428571429,
+        "condition_auroc": 0.8831168831168831
+      },
+      "delta": {
+        "material_acc": 0.04,
+        "material_f1": 0.0384,
+        "threat_qwk": 0.0,
+        "route_f1": 0.0,
+        "condition_auroc": 0.013
+      }
+    },
+    "test": {
+      "baseline": {
+        "material_acc": 0.84,
+        "material_f1": 0.8395154845154845,
+        "threat_qwk": 0.8260594560404807,
+        "route_f1": 0.7395658263305322,
+        "condition_auroc": 0.8663446054750402
+      },
+      "tta": {
+        "material_acc": 0.84,
+        "material_f1": 0.8395154845154845,
+        "threat_qwk": 0.8260594560404807,
+        "route_f1": 0.7395658263305322,
+        "condition_auroc": 0.8727858293075684
+      },
+      "delta": {
+        "material_acc": 0.0,
+        "material_f1": 0.0,
+        "threat_qwk": 0.0,
+        "route_f1": 0.0,
+        "condition_auroc": 0.0064
+      }
+    }
+  },
+  "note": "base view reproduces SC12; TTA averages logits over 4 deterministic views. Material acc/F1 and threat QWK are argmax-based, so calibration does not affect them."
+}

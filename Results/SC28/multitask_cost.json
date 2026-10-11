@@ -1,0 +1,15 @@
+{
+  "single_task": {
+    "acc": 0.84,
+    "macro_f1": 0.8395154845154845
+  },
+  "multi_task": {
+    "acc": 0.84,
+    "macro_f1": 0.8395154845154845,
+    "source": "metrics_convnext_small.fb_in22k_ft_in1k.json"
+  },
+  "cost": {
+    "d_acc": 0.0,
+    "d_f1": 0.0
+  }
+}

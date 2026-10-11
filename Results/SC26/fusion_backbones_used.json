@@ -1,0 +1,6 @@
+[
+  "convnext_small.fb_in22k_ft_in1k",
+  "convnext_tiny",
+  "resnet50",
+  "vit_base_patch14_dinov2.lvd142m"
+]

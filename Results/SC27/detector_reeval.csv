@@ -1,0 +1,2 @@
+weights,test_items,test_views,mAP50,mAP50_95,precision,recall,detect_rate_conf025
+/kaggle/input/notebooks/fbanabil/sc8-detection-yolo/det/weights/best.pt,50,221,0.9922,0.8534,0.9776,0.9892,1.0

@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering
+\caption{Detection model comparison on the held-out test split (identical training budget).}
+\label{tab:det_compare}
+\begin{tabular}{lccccccccc}
+\toprule
+Model & Type & P & R & F1 & mAP@50 & mAP@50:95 & Params (M) & GFLOPs & Speed (ms) \\
+\midrule
+\textbf{yolo12s} & CNN & 0.985 & 0.986 & 0.986 & 0.992 & 0.857 & 9.3 & nan & 12.8 \\
+yolov9s & CNN & 0.956 & 0.968 & 0.962 & 0.979 & 0.849 & 7.3 & nan & 10.8 \\
+yolo11s & CNN & 0.989 & 0.985 & 0.987 & 0.991 & 0.846 & 9.5 & nan & 9.2 \\
+yolov10s & CNN & 0.974 & 0.966 & 0.970 & 0.984 & 0.837 & 8.1 & nan & 9.0 \\
+yolov8s & CNN & 0.971 & 0.981 & 0.976 & 0.989 & 0.825 & 11.2 & nan & 9.3 \\
+rtdetr-l & Transformer & 0.872 & 0.904 & 0.888 & 0.905 & 0.738 & 33.0 & nan & 39.1 \\
+\bottomrule
+\end{tabular}
+\end{table}

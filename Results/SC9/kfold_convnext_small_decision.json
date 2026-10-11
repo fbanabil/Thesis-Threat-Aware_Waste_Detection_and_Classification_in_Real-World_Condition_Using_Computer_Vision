@@ -1,0 +1,16 @@
+{
+  "pooled": {
+    "total_cost": 459.0,
+    "coverage": 0.9606,
+    "hazard_recall": 0.8876,
+    "n": 457
+  },
+  "hazard_recall_ci": [
+    0.838,
+    0.9325
+  ],
+  "cost_per_item_ci": [
+    0.6849,
+    1.3632
+  ]
+}

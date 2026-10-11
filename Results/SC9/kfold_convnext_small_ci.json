@@ -1,0 +1,31 @@
+{
+  "n_items": 457,
+  "n_bootstrap": 5000,
+  "ci": {
+    "material_acc": {
+      "point": 0.8315,
+      "lo": 0.7965,
+      "hi": 0.8643
+    },
+    "material_f1": {
+      "point": 0.8033,
+      "lo": 0.7596,
+      "hi": 0.8407
+    },
+    "route_f1": {
+      "point": 0.6754,
+      "lo": 0.6079,
+      "hi": 0.7354
+    },
+    "threat_qwk": {
+      "point": 0.7709,
+      "lo": 0.7075,
+      "hi": 0.8311
+    },
+    "condition_auroc": {
+      "point": 0.8211,
+      "lo": 0.7824,
+      "hi": 0.8569
+    }
+  }
+}

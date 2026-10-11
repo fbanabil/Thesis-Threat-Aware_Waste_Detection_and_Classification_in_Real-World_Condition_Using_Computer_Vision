@@ -1,0 +1,17 @@
+{
+  "classes": [
+    "cardboard",
+    "glass",
+    "metal",
+    "paper",
+    "plastic",
+    "trash"
+  ],
+  "n_train": 2024,
+  "n_test": 503,
+  "init": "yours",
+  "test_acc": 0.8887,
+  "macro_f1": 0.861,
+  "published_resnet50_ref": 0.87,
+  "published_googlenet_ref": 0.9786
+}

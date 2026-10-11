@@ -1,0 +1,6 @@
+{
+  "n": 203,
+  "detect_rate": 1.0,
+  "material_acc_oracle_crop": 0.729064039408867,
+  "material_acc_end_to_end": 0.7142857142857143
+}

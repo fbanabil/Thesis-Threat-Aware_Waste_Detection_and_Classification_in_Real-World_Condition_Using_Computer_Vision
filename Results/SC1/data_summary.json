@@ -1,0 +1,53 @@
+{
+  "items": {
+    "train": 385,
+    "val": 50,
+    "test": 50
+  },
+  "images": {
+    "train": 4926,
+    "val": 216,
+    "test": 221
+  },
+  "materials": [
+    "plastic",
+    "paper",
+    "metal",
+    "glass",
+    "textile",
+    "e_waste",
+    "battery",
+    "sharps",
+    "hazardous_chemical",
+    "composite"
+  ],
+  "routes": [
+    "Reuse",
+    "Recycle",
+    "Landfill",
+    "Special"
+  ],
+  "material_counts": {
+    "plastic": 107,
+    "glass": 60,
+    "metal": 54,
+    "paper": 50,
+    "battery": 47,
+    "sharps": 41,
+    "hazardous_chemical": 36,
+    "composite": 34,
+    "e_waste": 30,
+    "textile": 26
+  },
+  "route_counts": {
+    "Special": 184,
+    "Recycle": 154,
+    "Landfill": 133,
+    "Reuse": 14
+  },
+  "threat_counts": {
+    "2": 194,
+    "3": 161,
+    "1": 130
+  }
+}

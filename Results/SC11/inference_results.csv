@@ -1,0 +1,12 @@
+item,material,material_conf,condition,condition_conf,threat_level,threat,route,confidence,why,n_views,true_material,true_condition,true_threat,true_route,mat_ok,cond_ok,threat_ok,route_ok
+item_001,battery,0.748,Good,0.669,3,high(3),Special,0.748,force_special:battery ; safety: Special on either head/policy,5,battery,Good,2,Special,True,True,False,True
+item_004,battery,0.972,Good,0.822,3,high(3),Special,0.837,force_special:battery ; safety: Special on either head/policy,3,battery,Good,2,Special,True,True,False,True
+item_027,battery,0.918,Good,0.697,3,high(3),Special,0.849,force_special:battery ; safety: Special on either head/policy,3,battery,Good,3,Special,True,True,True,True
+item_049,composite,0.737,Good,0.701,2,moderate(2),Landfill,0.737,"matrix[composite,Good]=Landfill ; policy==head",5,composite,Good,2,Landfill,True,True,True,True
+item_062,paper,0.586,Poor,0.683,2,moderate(2),Landfill,0.578,"matrix[paper,Poor]=Landfill ; policy==head",5,composite,Poor,2,Landfill,False,True,True,True
+item_133,glass,0.978,Poor,0.609,3,high(3),Special,0.553,threat=3 backstop ; safety: Special on either head/policy,6,glass,Good,2,Recycle,True,False,False,False
+item_135,plastic,0.89,Good,0.613,2,moderate(2),Recycle,0.353,"matrix[plastic,Good]=Recycle ; conflict pol=Recycle/head=Landfill (rconf=0.35)->Recycle",7,glass,Good,2,Recycle,False,True,True,True
+item_146,hazardous_chemical,0.405,Good,0.748,3,high(3),Special,0.405,force_special:hazardous_chemical ; safety: Special on either head/policy,3,glass,Good,2,Recycle,False,True,False,False
+item_341,paper,0.935,Good,0.53,1,minor(1),Recycle,0.564,"matrix[paper,Good]=Recycle ; conflict pol=Recycle/head=Landfill (rconf=0.56)->Recycle",2,paper,Poor,1,Landfill,True,False,True,False
+item_458,textile,0.663,Poor,0.525,1,minor(1),Recycle,0.646,"matrix[textile,Poor]=Recycle ; conflict pol=Recycle/head=Reuse (rconf=0.65)->Recycle",6,textile,Good,1,Reuse,True,False,True,False
+item_469,textile,0.964,Good,0.701,1,minor(1),Reuse,0.964,"matrix[textile,Good]=Reuse ; policy==head",5,textile,Good,1,Reuse,True,True,True,True

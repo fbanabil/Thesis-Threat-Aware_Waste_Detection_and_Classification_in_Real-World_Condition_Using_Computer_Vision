@@ -1,0 +1,58 @@
+{
+  "version": "2.1-10class",
+  "confidence_threshold_route": 0.45,
+  "reuse_max_threat": 1,
+  "threat_force_special_level": 3,
+  "material_force_special": [
+    "e_waste",
+    "battery",
+    "sharps",
+    "hazardous_chemical"
+  ],
+  "material_force_special_priority1": [
+    "battery"
+  ],
+  "recyclables": [
+    "plastic",
+    "paper",
+    "metal",
+    "glass",
+    "textile"
+  ],
+  "material_default_threat": {
+    "plastic": 2,
+    "paper": 1,
+    "metal": 1,
+    "glass": 2,
+    "textile": 1,
+    "e_waste": 3,
+    "battery": 3,
+    "sharps": 3,
+    "hazardous_chemical": 3,
+    "composite": 2
+  },
+  "material_default_route_good": {
+    "plastic": "Recycle",
+    "paper": "Recycle",
+    "metal": "Recycle",
+    "glass": "Recycle",
+    "textile": "Reuse",
+    "e_waste": "Special",
+    "battery": "Special",
+    "sharps": "Special",
+    "hazardous_chemical": "Special",
+    "composite": "Landfill"
+  },
+  "material_default_route_poor": {
+    "plastic": "Landfill",
+    "paper": "Landfill",
+    "metal": "Recycle",
+    "glass": "Special",
+    "textile": "Recycle",
+    "e_waste": "Special",
+    "battery": "Special",
+    "sharps": "Special",
+    "hazardous_chemical": "Special",
+    "composite": "Landfill"
+  }
+}

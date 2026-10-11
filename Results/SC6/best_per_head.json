@@ -1,0 +1,6 @@
+{
+  "material": "convnext_small.fb_in22k_ft_in1k",
+  "route": "resnet50",
+  "threat": "fusion",
+  "condition": "vit_small_patch14_dinov2.lvd142m"
+}

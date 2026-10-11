@@ -1,0 +1,86 @@
+[
+  {
+    "backbone": "fusion",
+    "model": "Fusion (3-bb)",
+    "family": "Ensemble",
+    "material_acc": 0.84,
+    "material_f1": 0.8395154845154845,
+    "condition_auroc": 0.8695652173913044,
+    "route_f1": 0.739882662835249,
+    "threat_qwk": 0.8571428571428572,
+    "threat_mae": 0.14,
+    "material_ece": 0.114275461435318
+  },
+  {
+    "backbone": "convnext_small.fb_in22k_ft_in1k",
+    "model": "ConvNeXt-S (ours)",
+    "family": "CNN (ConvNet)",
+    "material_acc": 0.84,
+    "material_f1": 0.8395154845154845,
+    "condition_auroc": 0.8647342995169082,
+    "route_f1": 0.7395658263305322,
+    "threat_qwk": 0.8260594560404807,
+    "threat_mae": 0.18,
+    "material_ece": 0.11015703797340395
+  },
+  {
+    "backbone": "convnext_tiny",
+    "model": "ConvNeXt-T",
+    "family": "CNN (ConvNet)",
+    "material_acc": 0.82,
+    "material_f1": 0.823034859876965,
+    "condition_auroc": 0.7938808373590982,
+    "route_f1": 0.7499683744465528,
+    "threat_qwk": 0.8396407953816549,
+    "threat_mae": 0.16,
+    "material_ece": 0.11579683601856233
+  },
+  {
+    "backbone": "vit_small_patch14_dinov2.lvd142m",
+    "model": "DINOv2 ViT-S",
+    "family": "Transformer (ViT)",
+    "material_acc": 0.76,
+    "material_f1": 0.7693646549528902,
+    "condition_auroc": 0.9049919484702094,
+    "route_f1": 0.7340167753960858,
+    "threat_qwk": 0.8253968253968254,
+    "threat_mae": 0.18,
+    "material_ece": 0.1365634042024613
+  },
+  {
+    "backbone": "efficientnet_b0",
+    "model": "EfficientNet-B0",
+    "family": "CNN",
+    "material_acc": 0.78,
+    "material_f1": 0.7677272727272727,
+    "condition_auroc": 0.8743961352657005,
+    "route_f1": 0.7659621802002226,
+    "threat_qwk": 0.7164776517678453,
+    "threat_mae": 0.3,
+    "material_ece": 0.1529072141647339
+  },
+  {
+    "backbone": "mobilenetv3_large_100",
+    "model": "MobileNetV3-L",
+    "family": "CNN",
+    "material_acc": 0.72,
+    "material_f1": 0.7208791208791209,
+    "condition_auroc": 0.8711755233494364,
+    "route_f1": 0.6834498291394844,
+    "threat_qwk": 0.806076276664512,
+    "threat_mae": 0.24,
+    "material_ece": 0.19958135634660717
+  },
+  {
+    "backbone": "resnet50",
+    "model": "ResNet-50",
+    "family": "CNN",
+    "material_acc": 0.72,
+    "material_f1": 0.7145299145299144,
+    "condition_auroc": 0.8743961352657005,
+    "route_f1": 0.8760504201680672,
+    "threat_qwk": 0.7637051039697542,
+    "threat_mae": 0.22,
+    "material_ece": 0.16708089113235475
+  }
+]

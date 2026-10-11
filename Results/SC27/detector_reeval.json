@@ -1,0 +1,18 @@
+{
+  "weights": "/kaggle/input/notebooks/fbanabil/sc8-detection-yolo/det/weights/best.pt",
+  "test_items": 50,
+  "test_views": 221,
+  "mAP50": 0.9922,
+  "mAP50_95": 0.8534,
+  "precision": 0.9776,
+  "recall": 0.9892,
+  "detect_rate_conf025": 1.0,
+  "missed_views": [],
+  "previous_published": {
+    "mAP50": 0.991,
+    "mAP50_95": 0.85,
+    "precision": 0.98,
+    "recall": 0.981,
+    "note": "published numbers, evaluated on the initial 457-item release (46-item test)"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "oracle": {
+    "material_acc": 0.84,
+    "material_f1": 0.8395154845154845,
+    "condition_auroc": 0.8663446054750402,
+    "route_f1": 0.7395658263305322,
+    "threat_qwk": 0.8260594560404807,
+    "threat_mae": 0.18
+  },
+  "end_to_end": {
+    "material_acc": 0.84,
+    "material_f1": 0.8395154845154845,
+    "condition_auroc": 0.8631239935587761,
+    "route_f1": 0.7242063492063492,
+    "threat_qwk": 0.8260594560404807,
+    "threat_mae": 0.18
+  },
+  "detect_rate": 1.0,
+  "decision": {
+    "total_cost": 66.0,
+    "coverage": 1.0,
+    "hazard_recall": 0.8235294117647058,
+    "n": 50,
+    "route_conflicts": 2,
+    "threat_conflicts": 5,
+    "mean_confidence": 0.757,
+    "threat_recon_mae": 0.2,
+    "high_conf_route_acc": 1.0,
+    "low_conf_route_acc": 0.52
+  }
+}

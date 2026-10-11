@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{Classification backbone comparison on the held-out test split (item-level, views aggregated). Best per column in bold.}
+\label{tab:cls_compare}
+\begin{tabular}{llccccccc}
+\toprule
+Backbone & Family & Mat.\,Acc & Mat.\,F1 & Cond.\,AUROC & Route\,F1 & Threat\,QWK & Threat\,MAE & Mat.\,ECE \\
+\midrule
+Fusion (3-bb) & Ensemble & \textbf{0.840} & \textbf{0.840} & 0.870 & 0.740 & \textbf{0.857} & \textbf{0.140} & 0.114 \\
+ConvNeXt-S (ours) & CNN (ConvNet) & 0.840 & 0.840 & 0.865 & 0.740 & 0.826 & 0.180 & \textbf{0.110} \\
+ConvNeXt-T & CNN (ConvNet) & 0.820 & 0.823 & 0.794 & 0.750 & 0.840 & 0.160 & 0.116 \\
+DINOv2 ViT-S & Transformer (ViT) & 0.760 & 0.769 & \textbf{0.905} & 0.734 & 0.825 & 0.180 & 0.137 \\
+EfficientNet-B0 & CNN & 0.780 & 0.768 & 0.874 & 0.766 & 0.716 & 0.300 & 0.153 \\
+MobileNetV3-L & CNN & 0.720 & 0.721 & 0.871 & 0.683 & 0.806 & 0.240 & 0.200 \\
+ResNet-50 & CNN & 0.720 & 0.715 & 0.874 & \textbf{0.876} & 0.764 & 0.220 & 0.167 \\
+\bottomrule
+\end{tabular}
+\end{table}
